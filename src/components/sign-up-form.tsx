@@ -1,41 +1,89 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const SignUpForm = () => {
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassowrd] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const clear = () => {
+
     if (error) {
       setError("");
     }
+
+    if(success) {
+      setSuccess("");
+    }
+    
   };
 
-  const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const reset = () => {
+    setFullName("");
+    setEmail("");
+    setPassowrd("");
+  };
 
+  const onSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
+    if (!fullName || !email || !password) {
       setError("All fields are required.");
-      return
+      return;
     }
 
+    try {
+      const body = JSON.stringify({ name: fullName, email, password });
 
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const result = await axios.post("api/sign-up", body, config);
+
+      const response = result.data;
+
+      console.log(`Response: ${JSON.stringify(result.data)}`);
+
+      if (response.type === "success") {
+
+        reset();
+        setSuccess(response.message);
+
+      }
+
+      if (response.type === "error") {
+
+        setError(response.message);
+
+      }
+
+    } catch (error) {
+      
+      console.log(`Error: ${error}`);
+
+      setError("Something went wrong");
+    }
   };
 
   return (
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
         <h1 className="text-xl font-bold my-4">Sign up with us</h1>
-        <form className="flex flex-col gap-3">
+        <form id="sign-up-form" className="flex flex-col gap-3">
           <input
-            value={name}
+            value={fullName}
             onChange={(e) => {
-              setName(e.target.value);
+              setFullName(e.target.value);
               clear();
             }}
             type="text"
@@ -68,7 +116,13 @@ const SignUpForm = () => {
 
           {error && (
             <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounden-md mt-2 rounded-md">
-              Error message
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-500 text-white w-fit text-sm py-1 px-3 rounden-md mt-2 rounded-md">
+              {success}
             </div>
           )}
 
