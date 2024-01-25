@@ -2,14 +2,19 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
+import { MessageType } from "@/app/lib/enums";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 const SignUpForm = () => {
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassowrd] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const router = useRouter();
 
   const clear = () => {
 
@@ -29,9 +34,10 @@ const SignUpForm = () => {
     setPassowrd("");
   };
 
-  const onSubmit = async (
+  const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
+
     e.preventDefault();
 
     if (!fullName || !email || !password) {
@@ -40,6 +46,7 @@ const SignUpForm = () => {
     }
 
     try {
+
       const body = JSON.stringify({ name: fullName, email, password });
 
       const config = {
@@ -54,18 +61,21 @@ const SignUpForm = () => {
 
       console.log(`Response: ${JSON.stringify(result.data)}`);
 
-      if (response.type === "success") {
+      if (response.type === MessageType.Success) {
 
         reset();
+
         setSuccess(response.message);
 
+        setTimeout(() => {
+          router.push("/");
+        }, 1500)
+
+        return
+
       }
 
-      if (response.type === "error") {
-
-        setError(response.message);
-
-      }
+      setError(response.message);
 
     } catch (error) {
       
@@ -108,7 +118,7 @@ const SignUpForm = () => {
             placeholder="Password"
           />
           <button
-            onClick={(e) => onSubmit(e)}
+            onClick={(e) => handleSubmit(e)}
             className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2 rounded-md"
           >
             Sign up
@@ -122,7 +132,7 @@ const SignUpForm = () => {
 
           {success && (
             <div className="bg-green-500 text-white w-fit text-sm py-1 px-3 rounden-md mt-2 rounded-md">
-              {success}
+              { success }
             </div>
           )}
 

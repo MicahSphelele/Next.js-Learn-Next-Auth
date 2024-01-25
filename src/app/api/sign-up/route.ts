@@ -1,38 +1,38 @@
 import { connectMongoDB } from "@/app/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
+import { MessageType } from "@/app/lib/enums";
 import User from "../../../../models/user";
 import bcrypt from "bcryptjs";
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 
-    try {
-        
-        const { email, name, password } = await req.json();
+  try {
 
-        await connectMongoDB();
+    const { email, name, password } = await req.json();
 
-        const existingUser = await User.findOne({email: email});
+    await connectMongoDB();
 
-        if(existingUser) {
-             
-            const response = { type: "error", message: "Account already exists" };
+    const existingUser = await User.findOne({ email: email });
 
-            return new NextResponse(JSON.stringify(response), {status: 200})
+    if (existingUser) {
+      const response = { type: MessageType.Error, message: "Account already exists" };
 
-        } else {
-            
-            const response = { type: "success", message: "New account has been registered" };
+      return new NextResponse(JSON.stringify(response), { status: 200 });
+    } else {
+      const response = {
+        type: MessageType.Success,
+        message: "New account has been registered",
+      };
 
-            const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-            await User.create({ name, email, password: hashedPassword });
+      await User.create({ name, email, password: hashedPassword });
 
-            return new NextResponse(JSON.stringify(response), {status: 201})
-        }
-
-
-    } catch(error) {
-
-        return new NextResponse("Internal server error while try to sign up", {status: 500})
+      return new NextResponse(JSON.stringify(response), { status: 201 });
     }
-};
+  } catch (error) {
+    return new NextResponse("Internal server error while try to sign up", {
+      status: 500,
+    });
+  }
+}
