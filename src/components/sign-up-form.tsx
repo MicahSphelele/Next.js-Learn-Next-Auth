@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from "react";
-import { MessageType } from "@/app/lib/enums";
+import { MessageType } from "../../domain/enums/enums";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 

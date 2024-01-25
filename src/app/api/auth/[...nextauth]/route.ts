@@ -1,14 +1,25 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { NextAuthOptions } from "next-auth";
+import { ISODateString, NextAuthOptions, Session } from "next-auth";
 import bcrypt from "bcryptjs";
 import { connectMongoDB } from "@/app/lib/mongodb";
-import User from "../../../../../models/user";
+import User from "../../../../../domain/models/user";
 
 interface Credentials {
   email: string;
   password: string;
 }
+
+export interface UserSession {
+  user:{
+      id: string,
+      name: string,
+      email: string
+  },
+  expires?: ISODateString
+}
+
+
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -16,6 +27,7 @@ const authOptions: NextAuthOptions = {
       name: "credentials",
       credentials: {},
       async authorize(credentials) {
+
         const { email, password } = credentials as Credentials;
 
         try {
@@ -34,7 +46,6 @@ const authOptions: NextAuthOptions = {
           }
 
           return user;
-          
         } catch (error) {
           return null;
         }
@@ -44,7 +55,7 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
   },

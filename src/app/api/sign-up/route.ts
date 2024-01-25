@@ -1,7 +1,7 @@
 import { connectMongoDB } from "@/app/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
-import { MessageType } from "@/app/lib/enums";
-import User from "../../../../models/user";
+import { MessageType } from "../../../../domain/enums/enums";
+import User from "../../../../domain/models/user";
 import bcrypt from "bcryptjs";
 
 export const POST = async (req: NextRequest) => {

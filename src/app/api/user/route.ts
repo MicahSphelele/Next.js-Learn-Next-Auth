@@ -1,6 +1,6 @@
 import { connectMongoDB } from "@/app/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
-import User from "../../../../models/user";
+import User from "../../../../domain/models/user";
 
 export const GET = async (req: NextRequest) => {
     

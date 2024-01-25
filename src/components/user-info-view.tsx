@@ -3,41 +3,52 @@
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AuthStatus } from "../../domain/enums/enums";
 
 const UserInfoView = () => {
+  const { data: session, status } = useSession();
 
-    const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
-    const { data: session } = useSession();
+  const router = useRouter();
 
-    useEffect(() => {
+  useEffect(() => {
+    if (status !== AuthStatus.Loading) {
+      if (status === AuthStatus.Unauthenticated) {
+        router.replace("/");
+      }
+    }
 
-        if(!session) {
-            router.replace("/");
-            return
-        }
+    if (!isMounted) {
+      setIsMounted(true);
+    }
+  }, [status, isMounted, router]);
 
-    }, [session, router]);
+  if (!isMounted) {
+    return null;
+  }
 
-  return session && (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-8 bg-zinc-300/10 flex flex-col gap-2 my-6">
-        <div>
-          Name: <span className="font-bold">{session?.user?.name}</span>
+  return (
+    session && (
+      <div className="grid place-items-center h-screen">
+        <div className="shadow-lg p-8 bg-zinc-300/10 flex flex-col gap-2 my-6">
+          <div>
+            Name: <span className="font-bold">{session?.user?.name}</span>
+          </div>
+          <div>
+            E-mail: <span className="font-bold">{session?.user?.email}</span>
+          </div>
+          <button
+            onClick={() => signOut()}
+            className="bg-red-500 text-white font-bold py-2 px-6 mt-3"
+          >
+            Sign out
+          </button>
         </div>
-        <div>
-          E-mail: <span className="font-bold">{session?.user?.email}</span>
-        </div>
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 text-white font-bold py-2 px-6 mt-3"
-        >
-          Sign out
-        </button>
       </div>
-    </div>
-  )
+    )
+  );
 };
 
 export default UserInfoView;
