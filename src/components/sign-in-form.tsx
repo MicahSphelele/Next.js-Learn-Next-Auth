@@ -49,7 +49,7 @@ const SignInForm = () => {
 
   return (
     <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
+      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-zinc-300/10">
         <h1 className="text-xl font-bold my-4">Sign in</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input

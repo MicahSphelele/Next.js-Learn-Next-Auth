@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AuthStatus } from "../../domain/enums/enums";
 import { SessionUser } from "../../domain/models/session/session-user";
+import ThemeSwitcher from "./theme/theme-switcher";
 
 const UserInfoView = () => {
   const { data: session, status } = useSession();
@@ -47,6 +48,9 @@ const UserInfoView = () => {
           <div>
             Account Creation: <span className="font-bold">{ accountCreationDate.toDateString() }</span>
           </div>
+          
+          <ThemeSwitcher />
+
           <button
             onClick={() => signOut()}
             className="bg-red-500 text-white font-bold py-2 px-6 mt-3"

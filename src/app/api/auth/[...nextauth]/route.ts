@@ -8,7 +8,8 @@ import { SessionUser } from "../../../../../domain/models/session/session-user";
 import { SignInCredentials } from "../../../../../domain/models/credentials/sign-in-credentials";
 
 
-const authOptions: NextAuthOptions = {
+const nextAuthOptions: NextAuthOptions = {
+
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -75,12 +76,14 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  theme: { colorScheme: "dark" },
+  debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
   },
 };
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth(nextAuthOptions);
 
 export { handler as GET, handler as POST };
