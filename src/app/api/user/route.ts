@@ -1,6 +1,6 @@
 import { connectMongoDB } from "@/app/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
-import User from "../../../../domain/models/user";
+import AppUser from "../../../../domain/models/mongo/user";
 
 export const GET = async (req: NextRequest) => {
     
@@ -10,7 +10,7 @@ export const GET = async (req: NextRequest) => {
     
     await connectMongoDB();
 
-    const existingUser = await User.findOne({ email: email }).select("_id");
+    const existingUser = await AppUser.findOne({ email: email }).select("_id");
 
     return new NextResponse(JSON.stringify({ existingUser }), { status: 200 });
   } catch (error) {

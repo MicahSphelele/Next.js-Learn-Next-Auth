@@ -1,24 +1,11 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { ISODateString, NextAuthOptions, Session } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import bcrypt from "bcryptjs";
 import { connectMongoDB } from "@/app/lib/mongodb";
-import User from "../../../../../domain/models/user";
-
-interface Credentials {
-  email: string;
-  password: string;
-}
-
-export interface UserSession {
-  user:{
-      id: string,
-      name: string,
-      email: string
-  },
-  expires?: ISODateString
-}
-
+import AppUser from "../../../../../domain/models/mongo/user";
+import { SessionUser } from "../../../../../domain/models/session/session-user";
+import { SignInCredentials } from "../../../../../domain/models/credentials/sign-in-credentials";
 
 
 const authOptions: NextAuthOptions = {
@@ -28,12 +15,13 @@ const authOptions: NextAuthOptions = {
       credentials: {},
       async authorize(credentials) {
 
-        const { email, password } = credentials as Credentials;
+        const { email, password } = credentials as SignInCredentials;
 
         try {
+
           await connectMongoDB();
 
-          const user = await User.findOne({ email: email });
+          const user = await AppUser.findOne({ email: email });
 
           if (!user) {
             return null;
@@ -52,6 +40,38 @@ const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+
+    async jwt({ token, user, session }) {
+
+      if(user) {
+        
+        const sessionUser = user as SessionUser;
+
+        return {
+          ...token,
+          id: sessionUser._id,
+          createdAt: sessionUser.createdAt
+        };
+
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+        createdAt: token.createdAt
+        }
+      };
+
+    },
+  },
   session: {
     strategy: "jwt",
   },

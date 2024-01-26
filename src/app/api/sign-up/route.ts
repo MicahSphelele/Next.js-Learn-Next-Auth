@@ -1,7 +1,7 @@
 import { connectMongoDB } from "@/app/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { MessageType } from "../../../../domain/enums/enums";
-import User from "../../../../domain/models/user";
+import AppUser from "../../../../domain/models/mongo/user";
 import bcrypt from "bcryptjs";
 
 export const POST = async (req: NextRequest) => {
@@ -12,7 +12,7 @@ export const POST = async (req: NextRequest) => {
 
     await connectMongoDB();
 
-    const existingUser = await User.findOne({ email: email });
+    const existingUser = await AppUser.findOne({ email: email });
 
     if (existingUser) {
       const response = { type: MessageType.Error, message: "Account already exists" };
@@ -26,7 +26,7 @@ export const POST = async (req: NextRequest) => {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await User.create({ name, email, password: hashedPassword });
+      await AppUser.create({ name, email, password: hashedPassword });
 
       return new NextResponse(JSON.stringify(response), { status: 201 });
     }
